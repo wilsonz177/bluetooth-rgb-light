@@ -1,0 +1,347 @@
+<!DOCTYPE html>
+
+<html>
+    <head>
+        <meta charset="utf-8">
+      <!--  <meta name="viewport" content="initial-scale=1, maximum-scale=1, user-scalable=no, width=device-width"> -->
+        <meta charset="utf-8">
+        <link rel="stylesheet" href="css/onsenui.css"/>
+        <link rel="stylesheet" href="css/onsen-css-components.css"/>
+        <script src="js/onsenui.js"></script>
+
+        <title>Bluetooth Light</title>
+    </head>
+    <body>
+    <ons-navigator id="pageNavigator" page="devices.html"></ons-navigator>
+    
+    <ons-modal id="refreshDevicesModal" animation="fade">
+        <ons-progress-circular indeterminate></ons-progress-circular>
+    </ons-modal>
+    
+    <!-- List of devices page -->
+    <ons-template id="devices.html">
+        <ons-page id="devicesPage">
+            <ons-toolbar>
+                <div class="center">Devices</div>
+                <div class="right">
+                    <ons-toolbar-button >
+                        <ons-icon icon="ion-refresh" id="refreshButton"></ons-icon>
+                    </ons-toolbar-button>
+                </div>
+            </ons-toolbar>
+    
+    
+           <ons-pull-hook id="pull-hook">
+                Pull to Refresh
+            </ons-pull-hook>
+    
+    
+            <ons-list id="deviceList">
+    
+            </ons-list>
+        </ons-page>
+    </ons-template>
+    
+    <ons-template id="page1.html">
+        <ons-page id="page1">
+            <ons-toolbar>
+                <div class="left"><ons-back-button>Disconnect</ons-back-button></div>
+                <div class="center">Bluetooth Light</div>
+                
+            </ons-toolbar>
+            
+            <ons-modal id="connectingModal" animation="fade">
+            Connecting...<br />
+            <ons-progress-circular indeterminate></ons-progress-circular>
+            </ons-modal>
+            
+                <ons-list>
+                    <ons-list-header>Light Switch</ons-list-header>
+                    <ons-list-item>
+                      <div class="center">
+                        Turn it on
+                      </div>
+                      <div class="right">
+                        <ons-switch id="lightSwitch"></ons-switch>
+                      </div>
+                    </ons-list-item>
+                    
+                    <ons-list-item>
+                        <div class="left">
+                            <ons-button modifier="large" id="onFade">Fade On </ons-button>
+                        </div>
+                       
+                        <div class="right">
+                            <ons-button modifier="large" id="offFade">Fade Off </ons-button>
+                        </div>
+                    </ons-list-item>
+                    
+                    <ons-list-header>Change Colors</ons-list-header>
+                    <ons-list-item modifier="chevron" tappable id="changeCurrentColor">Change Current Color</ons-list-item> 
+                   <ons-list-item modifier="chevron" tappable id="changeDefaultColor">Change Default Color</ons-list-item>
+                    
+                    <ons-list-header>Alarms</ons-list-header>
+                    <ons-list-item modifier="chevron" tappable id="alarms0">Alarms</ons-list-item>
+                    <ons-list-item modifier="chevron" tappable id="timers0">Timers</ons-list-item>
+                    
+                    
+                    
+                </ons-list>
+                <br>
+                <ons-list>
+                <ons-list-header>Time</ons-list-header>
+                <ons-list-item>
+                    <ons-button modifier="large" id="resetTime"> Reset the Time </ons-button>
+                <ons-list-item>
+                    Today is <span id="timeSpan"></span>
+                </ons-list-item>
+            </ons-list>
+                
+        </ons-page>
+    </ons-template>
+      
+    <ons-template id="currentColor.html">
+        <ons-page id="currentColor">
+            <ons-toolbar>
+                <div class="left"><ons-back-button>Back</ons-back-button></div>
+                <div class="center">Current Color</div>
+            </ons-toolbar>
+            <ons-list>
+                <ons-list-header>Red Value: <span id="currentRedValue"></span>%</ons-list-header>
+                    <ons-list-item>
+                        <ons-row>
+                        <ons-col width="40px" style="text-align: center; line-height: 31px;">
+                          0%
+                        </ons-col>
+                        <ons-col>
+                          <ons-range id="currentRedRange" min="0" max="100" style="width: 100%;" value="25"></ons-range min="0" max="100">
+                        </ons-col>
+                        <ons-col width="40px" style="text-align: center; line-height: 31px;">
+                          100%
+                        </ons-col>
+                        </ons-row>
+                  </ons-list-item>
+                    <ons-list-header>Green Value: <span id="currentGreenValue"></span>%</ons-list-header>
+                    <ons-list-item>
+                        <ons-row>
+                        <ons-col width="40px" style="text-align: center; line-height: 31px;">
+                          0%
+                        </ons-col>
+                        <ons-col>
+                          <ons-range id="currentGreenRange" min="0" max="100" style="width: 100%;" value="25"></ons-range min="0" max="100">
+                        </ons-col>
+                        <ons-col width="40px" style="text-align: center; line-height: 31px;">
+                          100%
+                        </ons-col>
+                        </ons-row>
+                  </ons-list-item>
+                    <ons-list-header>Blue Value: <span id="currentBlueValue"></span>%</ons-list-header>
+                    <ons-list-item>
+                        <ons-row>
+                        <ons-col width="40px" style="text-align: center; line-height: 31px;">
+                          0%
+                        </ons-col>
+                        <ons-col>
+                          <ons-range id="currentBlueRange" min="0" max="100" style="width: 100%;" value="25"></ons-range min="0" max="100">
+                        </ons-col>
+                        <ons-col width="40px" style="text-align: center; line-height: 31px;">
+                          100%
+                        </ons-col>
+                        </ons-row>
+                  </ons-list-item>
+            </ons-list>
+            <br>
+            
+                    <ons-button modifier="large" id="currentColorButton"> Submit </ons-button>
+                
+        </ons-page>
+    </ons-template>
+      
+    <ons-template id="defaultColor.html">
+        <ons-page id="defaultColor">
+            <ons-toolbar>
+                <div class="left"><ons-back-button>Back</ons-back-button></div>
+                <div class="center">Default Color</div>
+            </ons-toolbar>
+            <ons-list>
+                <ons-list-header>Red Value: <span id="defaultRedValue"></span>%</ons-list-header>
+                    <ons-list-item>
+                        <ons-row>
+                        <ons-col width="40px" style="text-align: center; line-height: 31px;">
+                          0%
+                        </ons-col>
+                        <ons-col>
+                          <ons-range id="defaultRedRange" min="0" max="100" style="width: 100%;" value="25"></ons-range min="0" max="100">
+                        </ons-col>
+                        <ons-col width="40px" style="text-align: center; line-height: 31px;">
+                          100%
+                        </ons-col>
+                        </ons-row>
+                  </ons-list-item>
+                    <ons-list-header>Green Value: <span id="defaultGreenValue"></span>%</ons-list-header>
+                    <ons-list-item>
+                        <ons-row>
+                        <ons-col width="40px" style="text-align: center; line-height: 31px;">
+                          0%
+                        </ons-col>
+                        <ons-col>
+                          <ons-range id="defaultGreenRange" min="0" max="100" style="width: 100%;" value="25"></ons-range min="0" max="100">
+                        </ons-col>
+                        <ons-col width="40px" style="text-align: center; line-height: 31px;">
+                          100%
+                        </ons-col>
+                        </ons-row>
+                  </ons-list-item>
+                    <ons-list-header>Blue Value: <span id="defaultBlueValue"></span>%</ons-list-header>
+                    <ons-list-item>
+                        <ons-row>
+                        <ons-col width="40px" style="text-align: center; line-height: 31px;">
+                          0%
+                        </ons-col>
+                        <ons-col>
+                          <ons-range id="defaultBlueRange" min="0" max="100" style="width: 100%;" value="25"></ons-range min="0" max="100">
+                        </ons-col>
+                        <ons-col width="40px" style="text-align: center; line-height: 31px;">
+                          100%
+                        </ons-col>
+                        </ons-row>
+                  </ons-list-item>
+                
+            </ons-list>
+            <br>
+            <ons-button modifier="large" id="defaultColorButton"> Submit </ons-button>
+        </ons-page>
+    </ons-template>
+    
+      
+    <ons-template id="alarms.html">
+        <ons-page id="alarms">
+            <ons-toolbar>
+                <div class="left"><ons-back-button>Back</ons-back-button></div>
+                <div class="center">Alarms</div>
+            </ons-toolbar>
+            <h2>On At Alarm</h2>
+            <ons-list>
+                <ons-list-header>On/Off</ons-list-header>
+                <ons-list-item>
+                        <div class="center">
+                        On/Off
+                      </div>
+                      <div class="right">
+                        <ons-switch id="onAlarmSwitch"></ons-switch>
+                      </div>
+                </ons-list-item>
+                <ons-list-item>
+                        Timer set to Hour: <span id="onAlarmTimeHour"></span> , Minute: <span id="onAlarmTimeMinute"></span>, Second: <span id="onAlarmTimeSecond"></span>
+                </ons-list-item>
+                <ons-list-header>Enter Hour</ons-list-header>
+                <ons-list-item>
+                    <ons-input id="onAlarmHourInput" type="number" placeholder="H" min="0" max="23"></ons-input>
+                </ons-list-item>
+                <ons-list-header>Enter Minute</ons-list-header>
+                <ons-list-item>
+                    <ons-input id="onAlarmMinuteInput" type="number" placeholder="H" min="0" max="59"></ons-input>
+                </ons-list-item>
+                <ons-list-header>Enter Second</ons-list-header>
+                <ons-list-item>
+                    <ons-input id="onAlarmSecondInput" type="number" placeholder="H" min="0" max="59"></ons-input>
+                </ons-list-item>
+                <ons-list-item>
+                        <ons-button modifier="large" id="onAlarmButton"> Submit </ons-button>
+                    </ons-list-item>
+            </ons-list>
+            <h2>Off At Alarm</h2>
+            <ons-list>
+                <ons-list-header>On/Off</ons-list-header>
+                <ons-list-item>
+                        <div class="center">
+                        On/Off
+                      </div>
+                      <div class="right">
+                        <ons-switch id="offAlarmSwitch"></ons-switch>
+                      </div>
+                </ons-list-item>
+                <ons-list-item>
+                        Timer set to Hour: <span id="offAlarmTimeHour"></span> , Minute: <span id="offAlarmTimeMinute"></span>, Second: <span id="offAlarmTimeSecond"></span>
+                </ons-list-item>
+                <ons-list-header>Enter Hour</ons-list-header>
+                <ons-list-item>
+                    <ons-input id="offAlarmHourInput" type="number" placeholder="H" min="0" max="23"></ons-input>
+                </ons-list-item>
+                <ons-list-header>Enter Minute</ons-list-header>
+                <ons-list-item>
+                    <ons-input id="offAlarmMinuteInput" type="number" placeholder="H" min="0" max="59"></ons-input>
+                </ons-list-item>
+                <ons-list-header>Enter Second</ons-list-header>
+                <ons-list-item>
+                    <ons-input id="offAlarmSecondInput" type="number" placeholder="H" min="0" max="59"></ons-input>
+                </ons-list-item>
+                <ons-list-item>
+                        <ons-button modifier="large" id="offAlarmButton"> Submit </ons-button>
+                    </ons-list-item>
+            </ons-list>
+           
+        </ons-page>
+    </ons-template>
+     
+    
+     
+    <ons-template id="timers.html">
+        <ons-page id="timers">
+            <ons-toolbar>
+                <div class="left"><ons-back-button>Back</ons-back-button></div>
+                <div class="center">Timers</div>
+                </ons-toolbar>
+                <h2>On Timer</h2>
+                <ons-list>
+                    <ons-list-item>
+                        <div class="center">
+                        On/Off
+                      </div>
+                      <div class="right">
+                        <ons-switch id="onTimerSwitch"></ons-switch>
+                      </div>
+                    </ons-list-item>
+                    <ons-list-item>
+                        Timer set to <span id="onTimerTime"></span> seconds
+                    </ons-list-item>
+                    
+                    <ons-list-header>Enter Seconds</ons-list-header>
+                    <ons-list-item>
+                        <ons-input id="onTimerInput"type="number" placeholder="H" min="0" max="59"></ons-input>
+                    </ons-list-item>
+                    <ons-list-item>
+                        <ons-button modifier="large" id="onTimerButton"> Submit </ons-button>
+                    </ons-list-item>
+                </ons-list>
+                <h2>Off Timer</h2>
+                <ons-list>
+                    <ons-list-item>
+                        <div class="center">
+                        On/Off
+                      </div>
+                      <div class="right">
+                        <ons-switch id="offTimerSwitch"></ons-switch>
+                      </div>
+                    </ons-list-item>
+                    <ons-list-item>
+                        Timer set to <span id="offTimerTime"></span> seconds
+                    </ons-list-item>
+                    
+                    <ons-list-header>Enter Seconds</ons-list-header>
+                    <ons-list-item>
+                        <ons-input id="offTimerInput"type="number" placeholder="H" min="0" max="59"></ons-input>
+                    </ons-list-item>
+                    <ons-list-item>
+                        <ons-button modifier="large" id="offTimerButton"> Submit </ons-button>
+                    </ons-list-item>
+                </ons-list>
+        </ons-page>
+    </ons-template>
+     
+
+     
+        <script type="text/javascript" src="cordova.js"></script>
+        <script type="text/javascript" src="js/index.js"></script>
+    </body>
+</html>

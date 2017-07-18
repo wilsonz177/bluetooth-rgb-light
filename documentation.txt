@@ -1,0 +1,169 @@
+Bluetooth Controlled Color Light by Wilson Zhong
+
+A colored light controlled via bluetooth, programmed using Arduino.
+cse222_assign10.ino holds the code that the redbear duo is programmed with.
+
+The web app is built on the PhoneGap app and uses Onsen UI styling to mimic a native iOS app.
+index.html and index.js hold all the code related specifically to controlling the lights.
+
+The redbear duo light can be turned on/off with fade via the on/off buttons.
+The rest of the features can be accessed by the web app.
+
+These features include:
+	-Turn the light on/off immediately (without fade)
+	-Turn the light on/off with fade
+	-Changing the current color's RGB values
+	-Changing the default color's RGB values
+	-Configuring the lamp's time to the current time (in UTC)
+	-Setting alarms that turn the lamp on or off, which go off every day at the specified time of day (hour,minute,second)
+	-Setting timers that turn the lamp on or off in the specified amount of seconds
+	
+	
+To begin, the webapp must connect to the device via bluetooth.
+The webapp shows a list of bluetooth devices and their UUID's. Be sure to choose the right one!
+
+After connecting, the webapp shows a page where all the features mentioned above are available.
+
+The Service Id is: "a337c90b-4e78-469e-905f-8a3248257e45";
+
+The web app uses bluetooth characteristics with 16bit UUID's to implement the features above:
+
+
++--------+------------------------------------------------------------------------------------------------------------------+---------+---------------------+
+|  UUID  | Meaning/Description                                                                                              | Byte(s) | Properties          |
++--------+------------------------------------------------------------------------------------------------------------------+---------+---------------------+
+| 0xA02F | -Holds an int value for Light Status                                                                             | 1       | Read,               |
+|        | -Reads whether the light is on/off (1 for on, 0 for off)                                                         |         | Write,              |
+|        | -Writes the light to turn on/off with/without fade (0 for fade off, 1 for fade on, 2 for on now, 3 for off now)  |         | Notify              |
++--------+------------------------------------------------------------------------------------------------------------------+---------+---------------------+
+| 0xB13A | -Holds 3 separate int values for Current Color                                                                   | 3       | Read,	            |
+|        | -First byte holds red, second byte holds green, third byte holds blue                                            |         | Write               |
++--------+------------------------------------------------------------------------------------------------------------------+---------+---------------------+
+| 0xC25D | -Holds an int value for the seconds to set the On Timer to                                                       | 1       | Read,               |
+|        |                                                                                                                  |         | Write               |
++--------+------------------------------------------------------------------------------------------------------------------+---------+---------------------+
+| 0xD95E | -Holds an int value to specify whether or not the On Timer is on/off (1 or 0)                                    | 1       | Read,               |
+|        |                                                                                                                  |         | Write               |
++--------+------------------------------------------------------------------------------------------------------------------+---------+---------------------+
+| 0xE67B | -Holds an int value for the seconds to set the Off Timer to                                                      | 1       | Read,               |
+|        |                                                                                                                  |         | Write               |
++--------+------------------------------------------------------------------------------------------------------------------+---------+---------------------+
+| 0xF22F | -Holds an int value to specify whether or not the Off Timer is on/off (1 or 0)                                   | 1       | Read,               |
+|        |                                                                                                                  |         | Write               |
++--------+------------------------------------------------------------------------------------------------------------------+---------+---------------------+
+| 0x0AD7 | -Holds an int value for the duo's current time in UNIX                                                           | 4       | Read,               |
+|        |                                                                                                                  |         | Write               |
++--------+------------------------------------------------------------------------------------------------------------------+---------+---------------------+
+| 0x1BE8 | -Holds 4 separate int values for the ON At Alarm feature                                                         | 4       | Read,               |
+|        | -The first byte represents whether the alarm is on or off (1 or 0)                                               |         | Write               |
+|        | -The second byte represents the hour at which to turn ON the lamp                                                |         |                     |
+|        | -The third byte represents the minute at which to turn ON the lamp                                               |         |                     |
+|        | -The fourth byte represents the second at which to turn ON the lamp                                              |         |                     |
++--------+------------------------------------------------------------------------------------------------------------------+---------+---------------------+
+| 0x2CF9 | -Holds 4 separate int values for the OFF At Alarm feature                                                        | 4       | Read,               |
+|        | -The first byte represents whether the alarm is on or off (1 or 0)                                               |         | Write               |
+|        | -The second byte represents the hour at which to turn OFF the lamp                                               |         |                     |
+|        | -The third byte represents the minute at which to turn OFF the lamp                                              |         |                     |
+|        | -The fourth byte represents the second at which to turn OFF the lamp                                             |         |                     |
++--------+------------------------------------------------------------------------------------------------------------------+---------+---------------------+
+| 0x3FA1 | -Holds 3 separate int values for the Default Color                                                               | 3       | Read,               |
+|        | -First byte holds red, second byte holds green, third byte holds blue                                            |         | Write               |
++--------+------------------------------------------------------------------------------------------------------------------+---------+---------------------+
+
+Notes:
+-Due to byte limitations, the ON/OFF timers can only be set using less than 60 seconds
+-ON/OFF timers need to have their time characteristics written to before being turned on
+-The current color is set to 0,0,0
+-The default color is set to 255,255,255
+-The time should be configured before the onAt/offAt alarms are used
+
+Navigating the Web App is intuitive and shouldn't be difficult
+The Web App uses onsen stack navigation.
+There are different pages for changing current color, default color, on/off timers, and onAt/onOff alarms.
+
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+ARDUINO DETAILS
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+Most of the features described are implemented using timers.
+The bluetooth characteristics specified above each have their own callback function, which runs every time a characteristic is read, written, or notified
+
+The crossFade(r,g,b) method takes in an int red, green, and blue value.
+This method is crucial for fading the light on or off.
+Cross fading consists of two timers, one to gradually change the color values, and one to run once and stop the crossFade process.
+The crossFade duration is 5 seconds and and the fade Interval is 100 milliseconds or 0.1 seconds.
+
+The global variable CurrentTime holds the current UNIX time stamp in an int datatype, and is read/written via the corresponding time Characteristic
+The global variable currentColor holds the lamp's current RGB values. So if it is off, it would hold the values: 0,0,0. Or if it was to show a bright green light: 0,255,0.
+The global variable defaultColor holds the lamp's default RGB values.
+
+The on buttons with or without fade change the lamp's current color to the default color
+The off buttons change the lamp's current color to 0,0,0.
+
+
+Button presses are detected using an attachInterrupt, which begins a timer. This timer runs every 0.1 second to check whether or not 
+the button read has fallen back to its default value. Once it falls back to the button read's default value, you know the button has been pressed once
+and you turn the lamp on/off depending on which button is pressed.
+
+
+
+///// onAT/offAT Alarms ////////
+
+The onAt/offAt Alarms work by checking every second whether the current time's hour, minute, and seconds matches 
+the onAt/offAt Alarm's hour, minute, and second and then fading on or off.
+
+The onAt read/write characteristics read or change the global variables onAtHour, onAtMinute, onAtSecond
+The offAt read/write characteristics read or change the global variables offAtHour, offAtMinute, offAtSecond
+
+///// ON/OFF IN TIMERS ////////
+
+The on/off in 'n' seconds feature works by changing the period of the on/off timers, which only run once and fade on/off when time has expired
+The on/off in characteristics receive the amount of time in seconds, yet the timers work in milliseconds so conversion is necessary.
+We are limited by the Period of milliseconds allowed by the timers, which is about 60 seconds.
+
+The onInTime and offInTime read/write characteristics change the period of the corresponding timers.
+The onIn offIn read/write characteristics start or end the corresponding timers.
+
+It is best to set the onInTime/offInTime periods before writing to onIn/offIn to activate the timer
+
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+WEB APP DETAILS
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+Initially the webapp shows a list of bluetooth devices and then connects to the chosen device.
+
+After connecting to the device, the web app begins listening for notifications on the lightStatus characteristic.
+Notifications of the lightStatus characteristic changes whether or not the switch (which displays whether the lamp is on or off) is checked or not.
+
+The switch is for turning the light on/off immediately
+The fadeOn/fadeOff buttons are for fading the light on and off
+The reset time button is for Configuring the device's time to the current time in UTC.
+The reset time button also display's the current time on the App.
+
+The webapp uses event listeners attached to submit buttons and switches to know when to write via bluetooth.
+There are separate pages for the onAt/offAt Alarms and the onIn/offIn Timers, which can be accessed by pressing the corresponding tabs on the main page
+Back buttons are always available on the top left toolbar and the center toolbar shows the title of the page you are on.
+
+
+The webapp reads from the current & default color characteristic every time the current & default color value page is loaded.
+The sliders and titles of the rgb values show the read values from the current/default characteristics
+The range sliders represent the red green and blue values and range from 0% to 100%, which is then converted to int values from 0 to 255.
+The sliders can be moved, and a button can be pressed to write new values to the corresponding characteristic.
+
+The Alarms/Timers page show:
+- switches for the whether the alarm or timer is on or off.
+- Input boxes for time values (hour minutes seconds, or just seconds)
+- A Submit button to write to the characteristic
+
+For the on/off In timers the time should be inputted and submitted before flipping the switch to turn the timer on.
+
+For the onAt/offAt Alarms, the time should be inputted and the switch should be set before pressing the submit button.
+
+
+
+
+
+
+
+
+
