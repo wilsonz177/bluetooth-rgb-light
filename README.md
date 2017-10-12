@@ -10,4 +10,4 @@ A Bluetooth Lamp made with a RedBear Duo, controlled via a webapp built with Pho
 * Setting alarms that turn the lamp on or off, which go off every day at the specified time of day (hour,minute,second)
 * Setting timers that turn the lamp on or off in the specified amount of seconds
 
-### see documentation.txt for more details
+### See documentation.txt for more details
