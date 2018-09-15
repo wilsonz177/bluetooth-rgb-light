@@ -1,5 +1,6 @@
 # bluetooth-rgb-light
-A Bluetooth Lamp made with a RedBear Duo, controlled via a webapp built with PhoneGap/Cordova
+A Bluetooth Lamp made with a RedBear Duo, controlled via a mobile app built with PhoneGap/Cordova
+The mobile phone app used to control the lamp can be used to make adjustments to all the features described below. For example, it can instantly change the lamp's color, set alarms and timers for when the lamp should turn on or off, etc.
 
 ### The lamp has the following features:
 * Turn the light on/off (the lamp will fade, meaning the lamp will get dimmer as it turns off or get brighter as it turns on
